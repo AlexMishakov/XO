@@ -1,5 +1,6 @@
 import os
 import curses
+import copy
 
 class Window:
     wind = None
@@ -244,15 +245,21 @@ class Game:
         if selectMenu == 0:
             self.menuPage()
     
-    def localGame(self):
+    def localGame(self, footer=""):
         self.win.clear()
         self.win.header = "Локальная игра вдвоем"
-        self.win.footer = "Чтобы вернуться в меню нажмите кнопку ESC или q"
-        self.setLine, self.setRow = self.win.showGameField(self.arrayField, self.user, self.setRow, self.setLine)
+        self.win.footer = footer+"Чтобы вернуться в меню нажмите кнопку ESC или q"
+        arrayFunField = copy.deepcopy(self.arrayField)
+        self.setLine, self.setRow = self.win.showGameField(arrayFunField, self.user, self.setRow, self.setLine)
 
         if self.setLine < 0 and self.setRow < 0:
             self.default()
             self.menuPage()
+        
+        if self.arrayField[self.setLine][self.setRow] != " ":
+            self.localGame("Данная ячейка уже занята\n")
+        else:
+            self.arrayField[self.setLine][self.setRow] = self.user
         
         if self.user == "X":
             self.user = "O"
