@@ -208,6 +208,7 @@ class Window:
 
 class Game:
     lenGrid = 3
+    endGameCount = 3
 
     def __init__(self):
         print("Start game")
@@ -260,26 +261,103 @@ class Game:
             self.localGame("Данная ячейка уже занята\n")
         else:
             self.arrayField[self.setLine][self.setRow] = self.user
-        
-        if self.user == "X":
-            self.user = "O"
-        else:
-            self.user = "X"
 
-        if self.endGame():
-            print()
-        else:
+        endGame = self.endGame()
+        if endGame == 0:
+            # continue game
+
+            if self.user == "X":
+                self.user = "O"
+            else:
+                self.user = "X"
+
             self.localGame()
+        else:
+            # end game
+            self.win.clear()
+            self.win.header = "Победил игрок: "+self.user
+            if endGame == 2:
+                self.win.header = "Ничья"
+            menuList = ["Заново", "Главное меню"]
+            selectMenu = self.win.showMenu(menuList)
+            if selectMenu == 1:
+                self.menuPage()
+            elif selectMenu == 0:
+                self.default()
+                self.localGame()
         
     def interGame(self):
         print()
 
     def endGame(self):
-        endGameBool = False
-        # for line in len(self.arrayField):
-        #     for row in len(line):
-        #         print()
+        # return options:
+        # 0 - continue game
+        # 1 - end game
+        # 2 - draw
 
-        return endGameBool
+        lenFor = self.lenGrid - self.endGameCount + 1
+        checkArray = [self.user]*self.endGameCount
+
+        # horizontal check
+        for i in range(lenFor):
+            if self.arrayField[self.setLine][i:self.endGameCount+i] == checkArray:
+                return 1
+        
+        # vertical check
+        for i in range(lenFor):
+            verticalArray = []
+            for lineInt in range(i, self.lenGrid):
+                verticalArray.append(self.arrayField[lineInt][self.setRow])
+            if verticalArray == checkArray:
+                return 1
+        
+        # diagonal left_top to right_bottom check
+        setLineNew = self.setLine
+        setRowNew = self.setRow
+
+        while setLineNew > 0 and setRowNew > 0:
+            setLineNew -= 1
+            setRowNew -= 1
+
+        arrayDiagonal = []
+        while setLineNew < self.lenGrid and setRowNew < self.lenGrid:
+            arrayDiagonal.append(self.arrayField[setLineNew][setRowNew])
+            setLineNew += 1
+            setRowNew += 1
+
+        for i in range(lenFor):
+            if arrayDiagonal[i:self.endGameCount+i] == checkArray:
+                return 1
+
+        # diagonal right_top to left_bottom check
+
+        setLineNew = self.setLine
+        setRowNew = self.setRow
+
+        while setLineNew > 0 and setRowNew < self.lenGrid-1:
+            setLineNew -= 1
+            setRowNew += 1
+
+        arrayDiagonal = []
+        while setLineNew < self.lenGrid and setRowNew > -1:
+            arrayDiagonal.append(self.arrayField[setLineNew][setRowNew])
+            setLineNew += 1
+            setRowNew -= 1
+
+        for i in range(lenFor):
+            if arrayDiagonal[i:self.endGameCount+i] == checkArray:
+                return 1
+
+
+        # draw check
+        countNul = 0
+        for line in self.arrayField:
+            for row in line:
+                if row == " ":
+                    countNul += 1
+        if countNul == 0:
+            return 2
+        
+        return 0
 
 gm = Game()
