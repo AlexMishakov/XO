@@ -274,6 +274,7 @@ class Game:
             self.localGame()
         else:
             # end game
+            self.default()
             self.win.clear()
             self.win.header = "Победил игрок: "+self.user
             if endGame == 2:
@@ -283,7 +284,6 @@ class Game:
             if selectMenu == 1:
                 self.menuPage()
             elif selectMenu == 0:
-                self.default()
                 self.localGame()
         
     def interGame(self):
@@ -304,13 +304,14 @@ class Game:
                 return 1
         
         # vertical check
-        for i in range(lenFor):
-            verticalArray = []
-            for lineInt in range(i, self.lenGrid):
-                verticalArray.append(self.arrayField[lineInt][self.setRow])
-            if verticalArray == checkArray:
-                return 1
+        verticalArray = []
+        for i in range(self.lenGrid):
+            verticalArray.append(self.arrayField[i][self.setRow])
         
+        for i in range(lenFor):
+            if verticalArray[i:self.endGameCount+i] == checkArray:
+                return 1
+
         # diagonal left_top to right_bottom check
         setLineNew = self.setLine
         setRowNew = self.setRow
